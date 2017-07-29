@@ -1,0 +1,12 @@
+{
+  "name": "getthepairs",
+  "version": "1.0.0",
+  "description": "Collect the pair to win the game",
+  "scripts": {
+    "start": "node app.js",
+  },
+  "author": "dheeraj",
+  "dependencies": {
+    "express": "~4.15.2"
+  }
+}
