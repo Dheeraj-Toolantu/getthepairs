@@ -3,10 +3,10 @@ var express = require('express')
   , http = require('http')
   , server = http.createServer(app)
   , io = require('socket.io').listen(server);
-var bodyParser = require('body-parser');
+//var bodyParser = require('body-parser');
 var path = require("path");  
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+//app.use(bodyParser.json());
+//app.use(bodyParser.urlencoded({extended: true}));
 
 var MongoClient = require('mongodb').MongoClient;
 var url = 'mongodb://18.220.65.66:27017/getthepairs';
