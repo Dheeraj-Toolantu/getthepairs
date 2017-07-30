@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 var MongoClient = require('mongodb').MongoClient;
-var url = 'mongodb://ec2-52-14-217-22.us-east-2.compute.amazonaws.com:27017/getthepairs';
+var url = 'mongodb://ec2-18-220-90-207.us-east-2.compute.amazonaws.com:27017/getthepairs';
 
 app.get('/', function (req, res) {
 	res.sendfile(__dirname + '/index.html');
