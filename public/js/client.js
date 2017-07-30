@@ -1,4 +1,3 @@
-				
 	var socket = io.connect();
 	var playerPlaying=[];
 	var playerScorecard=[];
@@ -202,24 +201,51 @@
 		
 	});
 	
-	socket.on('displayResult', function ( playerusername, usercollec_imgval, usercollec_img_count, usercollec_userrank ) {
-	    $("#displayResult").html('');
+	
+	socket.on('disableplayer', function (pendingPlayers){
 		
-		for(var l=0;l < playerusername.length;l++){
-			$("#displayResult").append('<div class="media"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="/'+usercollec_imgval[l]+'.jpg" alt="profile picture" height="80px" ></a></div><div class="media-body"><h4 class="media-heading"><strong>'+playerusername[l]+'</strong></h4><b>&nbsp;<span class="badge">Rank : '+usercollec_userrank[l]+'</span>&nbsp;<span class="badge">Pairs : '+usercollec_img_count[l]+'</span></b></div></div>'); 
+		$.each(pendingPlayers, function(key, value) {
+			
+			if(value.PlayerSocketId!=socket.id){
+				$("#"+value.PlayerSocketId).droppable("disable", 1);
+				$("."+value.PlayerSocketId).removeClass('borderGreen');
+				$("."+value.PlayerSocketId).addClass('borderRed');
+				
+				$.each(countdownarr, function(countkey, countval) {
+					if(countval.playersocketid==value.PlayerSocketId){
+						if(countval.countdownval){
+							countval.countdownval.stop();
+							$("."+value.PlayerSocketId).find("#countdown").remove();
+							countdownarr = countdownarr.filter(function(item){ 
+								 return (item.playersocketid !== value.PlayerSocketId); 
+							});		
+						}									
+					}
+				});	
+			}
+		});
+		
+	});
+	
+	socket.on('displayResult', function (data) {
+	    $("#displayResult").html('');
+		$("#menuToggler").show(500);
+		for(var l=0;l < data.length;l++){
+			$("#displayResult").append('<div class="media"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="/'+data[l].usercollec_imgval+'.jpg" alt="profile picture" height="80px" ></a></div><div class="media-body"><h4 class="media-heading"><strong>'+data[l].usercollec_username+'</strong></h4><b>&nbsp;<span class="badge">Pairs : '+data[l].usercollec_img_count+'</span></b></div></div>'); 
 		}
 		
+			// playerusername, usercollec_imgval, usercollec_img_count
 		/*
 		$.each(playerScorecard, function(key, value) {
 		    if(value.room==currentroom){
 				
 				$("#displayResult").append('<div class="media"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="/profile.png" alt="profile picture" height="80px" ></a></div><div class="media-body"><h4 class="media-heading"><strong>'+value.playername+'</strong></h4><b>&nbsp;<span class="badge">Rank : '+value.rank+'</span>&nbsp;<span class="badge">Coins : '+value.score+'</span></b></div></div>');
 				
-				
+				$("#menuToggler").show(500);
 			}
 		});
 		*/
-		$("#menuToggler").show(500);
+		
 	});
 	
 	
@@ -453,28 +479,27 @@
 				 }*/
 		}
 	});
-					
-					
-					$(document).ready(function(){
 
-						$("#start").on('click',function(e){
-							
-							playername=$("#username").val();
-							
-							$('.singleuser').html(playername);
-							//pass=$("#password").val();
-							if(username){
-								socket.emit('adduser',{
-									Playerusername : playername, 
-									PlayerSocketId : socket.id
-								});
-								$("#homearea").removeClass('hidepannel');
-								$("#wrapper").addClass('hidepannel');
-							}else{
-							  alert("Please give a suitable name in Username field");
-							}
-							e.preventDefault();
-						});
-
-					});
 	
+	
+	$(document).ready(function(){
+	
+    $("#start").on('click',function(e){
+        
+        playername=$("#username").val();
+        $('.singleuser').html(playername);
+		//pass=$("#password").val();
+        if(playername){
+            socket.emit('adduser',{
+				Playerusername : playername, 
+				PlayerSocketId : socket.id
+			});
+			$("#homearea").removeClass('hidepannel');
+			$("#wrapper").addClass('hidepannel');
+		}else{
+		  alert("Please give a suitable name in Username field");
+		}
+		e.preventDefault();
+    });
+	
+});
