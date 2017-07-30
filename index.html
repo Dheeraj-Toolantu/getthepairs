@@ -1,6 +1,6 @@
-<html>
+
     <title>Get The Pairs</title>
-<head>
+
     <!-- Bootstrap CSS -->
 	<link type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
     <!-- font Awesome CSS -->
@@ -87,196 +87,231 @@
     }
 	</style>
 	<link type="text/css" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" rel="stylesheet" /> 
-</head>	
-
-<body style="overflow-x:hidden">
+	<body style="overflow-x:hidden">
 
 <div id="gamearea" class="hidepannel">
-	
-	<div id="mySidenav" class="sidenav">
-	  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-	  <div id="onlineplayers"></div>
-	</div>
+<div id="mySidenav" class="sidenav">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+  <div id="onlineplayers"></div>
+</div>
 
-	<div id="main">
-		<div class="panel panel-default">
-			<span id="menuToggler" style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; <a href="javascript:void(0);">Invite Players</a></span>
-			<div class="pull-right" id="CountDownTimer" data-timer="0" style="width:auto; height: 100px;"></div>
-				<div class="panel-heading">	
-					<h3 class="panel-title">
-						<div class="media">
-							<div class="media-left">
-								<a href="javascript:void(0)">
-									<img class="media-object" src="/profile.png" alt="profile picture" height=80 >
-								</a>
-							</div>
-							<div class="media-body">
-								<h4 class="media-heading singleuser"><strong></strong></h4>
-								<span style="font-size:9px;">&nbsp;<a href="javascript:void(0)">Players Online <span class="badge" id="count"></span></a></span>
-								<span id="restartGame"></span>
-							</div>
-						</div>	
-					</h3>
+<div id="main">
+  	<div class="panel panel-default">
+		
+		<span id="menuToggler" style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; <a href="javascript:void(0);">Invite Players</a></span>
+		
+		<div class="pull-right" id="CountDownTimer" data-timer="0" style="width:auto; height: 100px;"></div>
+		  <div class="panel-heading">	
+			<h3 class="panel-title">
+			<div class="media">
+				<div class="media-left">
+					<a href="javascript:void(0)">
+						<img class="media-object" src="/profile.png" alt="profile picture" height=80 >
+					</a>
 				</div>
-			  <div class="panel-body">	
-				<div class="row">
-					<div id="targetOutcome" class="col-md-12 col-sm-12 col-xs-12"></div>
+				<div class="media-body">
+					<h4 class="media-heading singleuser"><strong></strong></h4>
+					<span style="font-size:9px;">&nbsp;<a href="javascript:void(0)">Players Online <span class="badge" id="count"></span></a></span>
+					 <span id="restartGame"></span>
 				</div>
-				<div  class="row">
-					<div id="displayResult" style="right: -190px; top: 0px; width: 200px;">
-						<p>Something here</p>
-					</div>
-					<script>
-						$('#displayResult').hover(function () {
-							 $(this).stop().animate({right:"0px"},500);     
-						   },function () {
-							   var width = $(this).width() -10;
-							   $(this).stop().animate({right: - width  },500);     
-						});
-					</script>
-					<div class="col-md-12 col-sm-12 col-xs-12">
-						<div class="swiper-container">
-							<div id="players" class="swiper-wrapper">
-							</div>
-						<!-- Add Pagination -->
-							<div class="swiper-pagination"></div>
-						</div>
-						<script>
-							var swiper = new Swiper('.swiper-container', {
-								pagination: '.swiper-pagination',
-								slidesPerView: 'auto',
-								nextButton: '.swiper-button-next',
-								prevButton: '.swiper-button-prev',
-								paginationClickable: true,
-								spaceBetween: 30,
-								grabCursor: true,
-								freeMode: true
-								
-							});
-						/*
-						var swiper = new Swiper('.swiper-container', {
-							scrollbar: '.swiper-scrollbar',
-							scrollbarHide: true,
-							slidesPerView: 'auto',
-							centeredSlides: true,
-							spaceBetween: 30,
-							grabCursor: true
-						});
-						*/					
-						</script>
-					</div>				
-					<div class="col-md-12 col-sm-12 col-xs-12" id="getAllpairs">		
-						<div class="col-md-12 center-text" id="currentuser" style="margin-top:10px;">
-							<span id="playerneeded" style="font-size:18px;"></span>
-						</div>
-					</div>
-					<div class="col-md-12 col-sm-12 col-xs-12">
-						<!--<canvas id="canvas" width=1400 height=800></canvas>-->
-						<div class="row">
-							<div id="conversation" class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="max-height:300px;overflow-y:scroll;"></div>
-						</div>
-						<div class="row">
-							<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-								<div class="input-group">
-									<input type="text" id="data" class="form-control" placeholder="MESSAGE">
-									<span class="input-group-btn">
-										<button class="btn btn-default" id="datasend" type="button">SEND</button>
-									</span>
-								</div><!-- /input-group -->
-							</div><!-- /.col-lg-6 -->
-						</div><!-- /.row -->
-					</div>
-				</div>	
+			</div>	
+			</h3>
+		  </div>
+		  <div class="panel-body">	
+			
+			<div  class="row">
+				<div id="targetOutcome" class="col-md-12 col-sm-12 col-xs-12"></div>
 			</div>
+			<div  class="row">
+				<div id="displayResult" style="right: -190px; top: 0px; width: 200px;max-height:500px;overflow-y:scroll;">
+					<p>Result Display</p>
+				</div>
+				<script>
+					
+				$('#displayResult').hover(function () {
+					 $(this).stop().animate({right:"0px"},500);     
+				   },function () {
+					   var width = $(this).width() -10;
+					   $(this).stop().animate({right: - width  },500);     
+				});
+				
+				</script>
+				
+				<div class="col-md-12 col-sm-12 col-xs-12">
+				<div class="swiper-container">
+					<div id="players" class="swiper-wrapper">
+						
+					</div>
+					
+					<!-- Add Pagination -->
+					<div class="swiper-pagination"></div>
+				</div>
+			<script>
+				var swiper = new Swiper('.swiper-container', {
+					pagination: '.swiper-pagination',
+					slidesPerView: 'auto',
+					nextButton: '.swiper-button-next',
+					prevButton: '.swiper-button-prev',
+					paginationClickable: true,
+					spaceBetween: 30,
+					grabCursor: true,
+					freeMode: true
+					
+				});
+				/*
+				var swiper = new Swiper('.swiper-container', {
+					scrollbar: '.swiper-scrollbar',
+					scrollbarHide: true,
+					slidesPerView: 'auto',
+					centeredSlides: true,
+					spaceBetween: 30,
+					grabCursor: true
+				});
+				*/
+			
+			</script>
+			
+				
+			</div>
+				
+				<div class="col-md-12 col-sm-12 col-xs-12" id="getAllpairs">		
+					<div class="col-md-12 center-text" id="currentuser" style="margin-top:10px;">
+						<span id="playerneeded" style="font-size:18px;"></span>
+					</div>
+				</div>
+				<div class="col-md-12 col-sm-12 col-xs-12">
+					<!--<canvas id="canvas" width=1400 height=800></canvas>-->
+					<div class="row">
+						<div id="conversation" class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="max-height:300px;overflow-y:scroll;"></div>
+					</div>
+					<div class="row">
+					  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+						<div class="input-group">
+						  <input type="text" id="data" class="form-control" placeholder="MESSAGE">
+						  <span class="input-group-btn">
+							 <button class="btn btn-default" id="datasend" type="button">SEND</button>
+						  </span>
+						</div><!-- /input-group -->
+					  </div><!-- /.col-lg-6 -->
+					</div><!-- /.row -->
+				</div>
+			</div>	
+		  </div>
 		</div>
-	</div>
+    </div>
 </div>
 <div id="homearea" class="panel panel-default hidepannel">
-	<div class="panel-heading">
+		<div class="panel-heading">
 		<h3 class="panel-title">Welcome to <strong>Get The Pairs Game</strong><b class="pull-right">&nbsp;<a href="javascript:void(0)">Players Online <span class="badge" id="allcount"></span></a></b></h3>
-	</div>
-	<div class="panel-body">
+		</div>
+		<div class="panel-body">
 		<div class="row">
 			<div class="container">
-				<div class="col-md-12">	
-					<div class="media">
-						<div class="media-left">
-							<a href="javascript:void(0)">
-								<img class="media-object" src="/profile.png" alt="profile picture" height=80 >
-							</a>
-						</div>
-						<div class="media-body">
-							<h4 class="media-heading singleuser"><strong>USER</strong></h4>
-						</div>
-						<div class="media-right">
+		<div class="col-md-12">	
+			<div class="media">
+				<div class="media-left">
+					<a href="javascript:void(0)">
+						<img class="media-object" src="/profile.png" alt="profile picture" height=80 >
+					</a>
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading singleuser"><strong>USER</strong></h4>
+						
+				</div><!-- /.row -->
+				<div class="media-right">
+						
 							<input type="text" id="roomname" class="form-control" placeholder="ROOM NAME">
+						  
 							<select id="roomlimit" class="form-control">
-								<option value="">PLAYER LIMIT</option>
-								<option value="3">3</option>
-								<option value="4">4</option>
-								<option value="5">5</option>
-								<option value="6">6</option>
-								<option value="7">7</option>
-								<option value="8">8</option>
-							</select>							
+							  <option value="">PLAYER LIMIT</option>
+							  <option value="3">3</option>
+							  <option value="4">4</option>
+							  <option value="5">5</option>
+							  <option value="6">6</option>
+							  <option value="7">7</option>
+							  <option value="8">8</option>
+							</select>
+							
 							<button class="btn btn-success	" id="roombutton" type="button">CREATE ROOM</button>
-						</div><!-- /.col-lg-6 -->
+						  </div><!-- /.col-lg-6 -->
 					</div>
 				</div>	
 			</div>
-		</div>
-		<br/>
-		<div class="row">
-			<div class="container">
+			</div>
+			<br>
+			<div class="row">
+				<div class="container">
 				<div class="col-md-6 col-sm-6 col-xs-6">
+					
 					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h3 class="panel-title">JOIN ROOMS</h3>
-						</div>
-						<div class="panel-body">
-							<ul class="list-group" id="rooms"></ul>
-						</div>
+					<div class="panel-heading">
+					<h3 class="panel-title">JOIN ROOMS</h3>
+					</div>
+					<div class="panel-body">
+					
+					<ul class="list-group" id="rooms">
+					</ul>
+					</div>
 					</div>
 				</div>
 				<div class="col-md-6 col-sm-6 col-xs-6">
 					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h3 class="panel-title">INVITATIONS</h3>
-						</div>
-						<div class="panel-body">
-							<ul class="list-group" id="invitations"></ul>
-						</div>
+					<div class="panel-heading">
+					<h3 class="panel-title">INVITATIONS</h3>
+					</div>
+					<div class="panel-body">
+					
+					<ul class="list-group" id="invitations">
+					</ul>
+					</div>
 					</div>
 				</div>
 			</div>
+			</div>
+		</div>
 		</div>
 	</div>
-</div>
 
-<div id="wrapper">
-	<div class="main">
+	<div id="wrapper">
+		<div class="main">
 		<div class="container">
-			<center>
-				<div class="row">
-					<div class="col-md-12">
-						<div class="logo"><img src="/thepair.png" height=200/></div>
-					</div>  
-					<div class="col-md-12">  
-						<div id="login">
-							<form id="loginForm">
-								<p><span class="fa fa-user"></span><input type="text"  id="username" Placeholder="Username" required></p>
-								<div>
-									<span style="width:48%; text-align:left;  display: inline-block;"><a class="small-text" href="javascript:void(0)">Forgotpassword?</a></span>
-									<span style="width:50%; text-align:right;  display: inline-block;"><button  id="start" >Start</button></span>
-								</div>
-							</form>
-						</div> <!-- end login -->
+		<center>
+		<div class="row">
+			
+			<div class="col-md-12">
+			  <div class="logo"><img src="/thepair.png" height=200>
+			  </div>
+			</div>  
+			
+			<div class="col-md-12">  
+			  <div id="login">
+				
+				<form id="loginForm">
+
+				 
+					<p ><span class="fa fa-user"></span><input type="text"  id="username" Placeholder="Username" required></p> <!-- JS because of IE support; better: placeholder="Username" -->
+					<div>
+						<span style="width:48%; text-align:left;  display: inline-block;"><a class="small-text" href="javascript:void(0)">Forgot
+						password?</a></span>
+						<span style="width:50%; text-align:right;  display: inline-block;"><button  id="start" >Start</button></span>
 					</div>
-				</div>
-			</center>
+
+				</form>
+
+				   <div class="clearfix"></div>
+
+			  </div> <!-- end login -->
+			  
+			</div>
+			
+			
+			
+	    </div>
+		
+		</center>
+			</div>
 		</div>
-	</div>
-</div>	
+	</div>	
 	
 	<script>
 		function openNav() {
@@ -365,6 +400,7 @@
             });
 
         </script>      
+<style>
 
+</style>
 </body>
-</html>
