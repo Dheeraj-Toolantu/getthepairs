@@ -15,7 +15,7 @@ app.get('/', function (req, res) {
 	res.sendfile(__dirname + '/index.html');
 });
 
-server.listen(8080);
+server.listen(4000);
 
 process.env.PWD = process.cwd()
 	
