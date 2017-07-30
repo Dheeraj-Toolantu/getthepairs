@@ -3,18 +3,19 @@ var express = require('express')
   , http = require('http')
   , server = http.createServer(app)
   , io = require('socket.io').listen(server);
+var bodyParser = require('body-parser');
 var path = require("path");  
-//var bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 
-//app.use(bodyParser.json());
-//app.use(bodyParser.urlencoded({extended: true}));
-
+var MongoClient = require('mongodb').MongoClient;
+var url = 'mongodb://18.220.65.66:27017/getthepairs';
 
 app.get('/', function (req, res) {
 	res.sendfile(__dirname + '/index.html');
 });
 
-server.listen(4000);
+server.listen(8080);
 
 process.env.PWD = process.cwd()
 	
@@ -65,51 +66,26 @@ io.sockets.on('connection', function (socket) {
 	});
 	
 	socket.on('create', function(room) {
-		var random = 1;
 		var playerlimit = room.roomlimit;
 		console.log("creating room...");
-		
-			var config = JSON.parse(process.env.APP_CONFIG);
-			var MongoClient = require('mongodb').MongoClient;
-			var mongoPassword = '789system';
-		
-			MongoClient.connect(
-				"mongodb://" + config.mongo.user + ":" + mongoPassword + "@" +
-				config.mongo.hostString, 
-				function(err, db) {
-					if(!err) {
-		               console.log("connected to mongodb->>");
-					   var collection = db.collection('pairtype');
-					   if(playerlimit==3){
-					      random = Math.floor(Math.random()*((11 - 1) + 1));
-					   }else if(playerlimit==4){
-						   random = Math.floor(Math.random()*((8 - 1) + 1));
-					   }else if(playerlimit==5){
-						   random = Math.floor(Math.random()*((7 - 1) + 1));
-					   }else if(playerlimit==6){
-						   random = Math.floor(Math.random()*((4 - 1) + 1));
-					   }else{
-						   random = Math.floor(Math.random()*((2 - 1) + 1));
-					   }
-					   var cursor = collection.find({ptype_player_count:playerlimit}).skip(random).limit(1);
-					   
-					   cursor.forEach(function(item) {
-						   if (item != null) {
-								imgvalue=item.ptype_set;
-								room['imgvalue'] = imgvalue;
-								rooms.push(room);;
-								socket.emit('updaterooms', room);
-								socket.broadcast.emit('updaterooms', room);
-								console.log('rooms created :'+ room.roomname);
-								console.log('rooms created with img:'+ room.imgvalue);
-							}
-					   });
-					   
-					}else {
-								console.log("Error while connecting to MongoDB\n");
-						}
-					db.close();	
-				});
+		MongoClient.connect(url, function(err, db) {
+		    var collection = db.collection('pairtype');
+		    var random = Math.floor(Math.random()*((2 - 1) + 1));
+		    var cursor = collection.find({ptype_player_count:playerlimit}).skip(random).limit(1);
+		   
+		    cursor.forEach(function(item) {
+			   if (item != null) {
+				   imgvalue=item.ptype_set;
+					room['imgvalue'] = imgvalue;
+					rooms.push(room);;
+					socket.emit('updaterooms', room);
+					socket.broadcast.emit('updaterooms', room);
+					console.log('rooms created :'+ room.roomname);
+					console.log('rooms created with img:'+ room.imgvalue);
+				}
+		    });
+			db.close();
+		});
 		
 	});
 	
@@ -191,7 +167,7 @@ io.sockets.on('connection', function (socket) {
 		// add the client's username to the global list
 		//usernames[username] = newroom.PlayerSocketId;
 	
-		  //Send this event to everyone in the room.
+		//Send this event to everyone in the room.
 		io.sockets.in(socket.room).emit('connectToRoom', "You are in room no. "+invitedroom.roomname);
 		// echo to room 1 that a person has connected to their room
 		socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username + ' has connected to this room');
@@ -269,15 +245,9 @@ io.sockets.on('connection', function (socket) {
 			data['score'] = '500';
 		}
 		
-		var config = JSON.parse(process.env.APP_CONFIG);
-		var MongoClient = require('mongodb').MongoClient;
-		var mongoPassword = '789system';
-	
-			MongoClient.connect(
-				"mongodb://" + config.mongo.user + ":" + mongoPassword + "@" +
-				config.mongo.hostString, 
-					function(err, db) {
-							if(!err) {
+		MongoClient.connect(url, 
+			function(err, db) {
+						if(!err) {
 								//db.collection("userpaircollection").drop();
 								console.log('collection before count is : '+db.collection("userpaircollection").count());
 								var myobj = [{ usercollec_id: "1", usercollec_imgval:data.imgval, usercollec_img_count: data.imgcnt,usercollec_userrank: data.rank, usercollec_username: data.playername, usercollec_usersocketid: data.srcsocketId, usercollec_room: currentroom, usercollec_user_ipaddr: "127.0.0.1" }];
@@ -306,49 +276,59 @@ io.sockets.on('connection', function (socket) {
 		var playercnt = ''+playerlimit+'';
 		console.log('after creting room-->' + playercnt);
 		if(!cntr){
-			console.log("Re-creating room...");
-		
-			var config = JSON.parse(process.env.APP_CONFIG);
-			var MongoClient = require('mongodb').MongoClient;
-			var mongoPassword = '789system';
-		
-			MongoClient.connect(
-				"mongodb://" + config.mongo.user + ":" + mongoPassword + "@" +
-				config.mongo.hostString, 
-				function(err, db) {
-					if(!err) {
-		               console.log("connected to mongodb->>");
-					   var collection = db.collection('pairtype');
-					   var random = Math.floor(Math.random()*((2 - 1) + 1));
-					   var cursor = collection.find({ptype_player_count:playercnt}).skip(random).limit(1);
-					   
-					   cursor.forEach(function(item) {
-						   if (item != null) {
-								imgvalue=item.ptype_set;
-							room =  {'imgvalue':imgvalue,
-									 'roomlimit': playerlimit,
-									 'roomname' : currentroom,
-									 'roompassword' : 'na'
-									}
-							rooms = rooms.filter(function(item){ 
-										return (item.roomname !== socket.room); 
-									});		
-							rooms.push(room);
-							socket.broadcast.to(socket.room).emit('recreateroom', room);
-							displayResult(playersocketid,currentroom);
-							console.log("game is over:-->"+socket.room);
-							}
-					   });
-					   
-					}else {
-								console.log("Error while connecting to MongoDB\n");
-						}
-					db.close();	
+			MongoClient.connect(url, function(err, db) {
+				var collection = db.collection('pairtype');
+				var random = Math.floor(Math.random()*((2 - 1) + 1));
+				var cursor = collection.find({ptype_player_count:playercnt}).skip(random).limit(1);
+			   
+				cursor.forEach(function(item) {
+				   if (item != null) {
+					   imgvalue=item.ptype_set;
+						room =  {'imgvalue':imgvalue,
+								 'roomlimit': playercnt,
+								 'roomname' : currentroom,
+								 'roompassword' : 'na'
+								}
+						rooms = rooms.filter(function(item){ 
+									return (item.roomname !== socket.room); 
+								});		
+						rooms.push(room);
+						socket.broadcast.to(socket.room).emit('recreateroom', room);
+						displayResult(playersocketid,currentroom);
+						console.log("game is over:-->"+socket.room);
+					}
 				});
+			});
 		cntr++;
-		}		
+		}			 
 	});
 	
+	
+	function displayResult(playersocketid,currentroom){
+	    console.log('displaying result....'+currentroom );
+		MongoClient.connect(url, function(err, db) {
+			var collection1 = db.collection('userpaircollection');
+				var cursor1 = collection1.aggregate(
+									   [
+										 { $group : { _id : "$usercollec_room", usercollec_username: { $push: "$usercollec_username" }, usercollec_imgval: { $push: "$usercollec_imgval" }, usercollec_img_count: { $push: "$usercollec_img_count" }, usercollec_userrank: { $push: "$usercollec_userrank" } } },
+										 { $match : { _id : currentroom } }
+									   ]
+									);
+			   
+				cursor1.forEach(function(item) {
+				   if (item != null) { 
+					    var idval = item._id;
+						var playerusername = item.usercollec_username;
+						var usercollec_imgval = item.usercollec_imgval;
+						var usercollec_img_count = item.usercollec_img_count;
+						var usercollec_userrank = item.usercollec_userrank;
+						socket.broadcast.to(currentroom).emit('displayResult', playerusername, usercollec_imgval, usercollec_img_count, usercollec_userrank);
+						console.log("Display Result : "+usercollec_imgval[0]+">>>"+usercollec_img_count[0]+">>>>>"+idval);
+					}
+				});
+		});	
+				
+	}
 	
 	socket.on('restartGame', function(newroom) {
         //var oldroom;
@@ -374,37 +354,6 @@ io.sockets.on('connection', function (socket) {
 		socket.emit('showgamearea');
 	});
 	
-	function displayResult(playersocketid,currentroom){
-	    console.log('displaying result....'+currentroom );
-		var config = JSON.parse(process.env.APP_CONFIG);
-		var MongoClient = require('mongodb').MongoClient;
-		var mongoPassword = '789system';
-	
-		MongoClient.connect(
-			"mongodb://" + config.mongo.user + ":" + mongoPassword + "@" +
-			config.mongo.hostString, 
-			function(err, db) {
-				var collection1 = db.collection('userpaircollection');
-				var cursor1 = collection1.aggregate(
-									   [
-										 { $group : { _id : "$usercollec_room", usercollec_username: { $push: "$usercollec_username" }, usercollec_imgval: { $push: "$usercollec_imgval" }, usercollec_img_count: { $push: "$usercollec_img_count" }, usercollec_userrank: { $push: "$usercollec_userrank" } } },
-										 { $match : { _id : currentroom } }
-									   ]
-									);
-				   
-					cursor1.forEach(function(item) {
-					   if (item != null) { 
-							var idval = item._id;
-							var playerusername = item.usercollec_username;
-							var usercollec_imgval = item.usercollec_imgval;
-							var usercollec_img_count = item.usercollec_img_count;
-							var usercollec_userrank = item.usercollec_userrank;
-							socket.broadcast.to(currentroom).emit('displayResult', playerusername, usercollec_imgval, usercollec_img_count, usercollec_userrank);
-							console.log("Display Result : "+usercollec_imgval[0]+">>>"+usercollec_img_count[0]+">>>>>"+idval);
-						}
-					});
-			});					
-	}
 	
 	socket.on('disconnect', function(){
 	
@@ -429,5 +378,4 @@ io.sockets.on('connection', function (socket) {
 		//socket.broadcast.emit('updatechat', 'SERVER', socket.username + ' has disconnected');
 		socket.leave(socket.room);
 	});
-	
 });
