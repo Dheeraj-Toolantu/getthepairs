@@ -23,7 +23,7 @@
 		var i=0;
 		$.each(onlineplayers, function(key, value) {
 				if(value.PlayerSocketId!=socket.id){
-					$('#onlineplayers').append('<div class="media"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="/profile.png" alt="profile picture" height="65px" ></a></div><div class="media-body"><h4 class="media-heading"><strong>'+value.player+'</strong></h4><b>&nbsp;<button class="btn btn-xs btn-primary" onclick="invitePlayer(\''+value.PlayerSocketId+'\')">Invite Player</button></b></div></div>');
+					$('#onlineplayers').append('<div class="media" style="padding:5px"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="/profile.png" alt="profile picture" height="60px" ></a></div><div class="media-body"><h4><strong>'+value.player+'</strong></h4><b>&nbsp;<button class="btn btn-xs btn-primary" onclick="invitePlayer(\''+value.PlayerSocketId+'\')">Invite</button></b></div></div>');
 				}
 			});	
 		
@@ -52,13 +52,14 @@
 						   var opponant = target.attr('data-opponant');
 						   var opponantsocketId = target.attr('data-opponant-socketId');
 						   var imgval=source.attr("data-val");
+						   var imgscore=source.attr("data-score");
 						   
 						   target.find("."+value.PlayerSocketId).removeClass('borderGreen');				
 						   target.find("."+value.PlayerSocketId).addClass('borderRed');				
 						   $("."+value.PlayerSocketId).html('Please Wait...');
 						   source.draggable("disable", 1);
 						   target.droppable("disable", 1);
-						   requestTo(opponant,opponantsocketId,imgval,roomdetails.roomlimit);
+						   requestTo(opponant,opponantsocketId,imgval,imgscore,roomdetails.roomlimit);
 						   source.draggable('destroy');
 						   source.hide(800,function(){
 								$(this).remove();
@@ -87,6 +88,7 @@
 					socket.emit('gameStarted',{
 							roomname:roomdetails.roomname,
 							imgvalue:roomdetails.imgvalue,
+							imgscore:roomdetails.imgscore,
 							playersocketid:socket.id
 					});
 					
@@ -112,7 +114,7 @@
 			
 	socket.on('receiveimg', function (username,data) {
 	var dragid = new Date().valueOf();
-	$('#currentuser').append('<div id="recievedrag-'+dragid+'" data-val="'+data.srcImg+'" class="col-xs-3 col-sm-3 col-md-2 col-lg-2 draggable"><a href="javascript:void(0)" id="'+data.srcImg+'"class="thumbnail" style="width:180px;height:250px"><img  src="/'+data.srcImg+'.jpg"  img-val="'+data.srcImg+'" width="180" height="250"></a></div>');
+	$('#currentuser').append('<div id="recievedrag-'+dragid+'" data-val="'+data.srcImg+'" data-score="'+data.imgscore+'" class="col-xs-3 col-sm-3 col-md-2 col-lg-2 draggable"><a href="javascript:void(0)" id="'+data.srcImg+'"class="thumbnail text-center" style="width:180px;height:250px"><img  src="/'+data.srcImg+'.jpg"  img-val="'+data.srcImg+'" width="180" height="250"><span class="badge">Score: '+data.imgscore+'</span></a></div>');
 					$('#recievedrag-'+dragid).draggable({
 					  revert: 'invalid',
 					  cursor:'move'
@@ -133,6 +135,7 @@
 					opponantsocketId:data.trgsocketId,
 					roomlimit:data.roomlimit,
 					imgvalue:data.srcImg,
+					imgscore:data.imgscore,
 					srcsocketid:data.srcsocketId
 				});
 				
@@ -231,10 +234,10 @@
 	    $("#displayResult").html('');
 		$("#menuToggler").show(500);
 		for(var l=0;l < data.length;l++){
-			$("#displayResult").append('<div class="media"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="/'+data[l].usercollec_imgval+'.jpg" alt="profile picture" height="80px" ></a></div><div class="media-body"><h4 class="media-heading"><strong>'+data[l].usercollec_username+'</strong></h4><b>&nbsp;<span class="badge">Pairs : '+data[l].usercollec_img_count+'</span></b></div></div>'); 
+			$("#displayResult").append('<div class="media"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="/'+data[l].usercollec_imgval+'.jpg" alt="profile picture" height="80px" ></a></div><div class="media-body"><h4 class="media-heading"><strong>'+data[l].usercollec_username+'</strong></h4><b>&nbsp;<span class="badge">Pairs : '+data[l].usercollec_img_count+'</span>&nbsp;<span class="badge">Score : '+data[l].userscore+'</span></b></div></div>'); 
 		}
 		
-			// playerusername, usercollec_imgval, usercollec_img_count
+		// playerusername, usercollec_imgval, usercollec_img_count
 		/*
 		$.each(playerScorecard, function(key, value) {
 		    if(value.room==currentroom){
@@ -248,20 +251,24 @@
 		
 	});
 	
-	
 	socket.on('recreateroom',function(room){
 		var str = room.imgvalue;
 		var imgvalue = new Array();
-		var roompass='';
 		imgvalue = str.split(",");
-		console.log('Client Imgvalue'+imgvalue);
+		console.log('Client Imgvalue '+imgvalue);
 		
+		var str1 = room.imgscore;
+		var imgscore = new Array();
+		imgscore = str1.split(",");
+		console.log('Client Imgscore '+imgscore);
+		
+		var roompass='';
 		if(room.roompassword){
 		 roompass=room.roompassword;
 		}else{ 
 		 roompass='na';
 		}
-		 $('#restartGame').html('<span><a href="javascript:void(0)" class="btn btn-sm btn-primary" onclick="restartGame(\''+room.roomname+'\',\''+room.roomlimit+'\',\''+roompass+'\',\''+imgvalue+'\')">Restart The Game</a></span>').delay( 2000 ).fadeIn( 400 );
+		 $('#restartGame').html('<span><a href="javascript:void(0)" class="btn btn-sm btn-primary" onclick="restartGame(\''+room.roomname+'\',\''+room.roomlimit+'\',\''+roompass+'\',\''+imgvalue+'\',\''+imgscore+'\')">Restart The Game</a></span>').delay( 2000 ).fadeIn( 400 );
 	
 	});
 	
@@ -269,33 +276,41 @@
 		var str = room.imgvalue;
 		var imgvalue = new Array();
 		imgvalue = str.split(",");
-		console.log('Client Imgvalue'+imgvalue);
+		console.log('Client Imgvalue: '+imgvalue);
+		
+		var str1 = room.imgscore;
+		var imgscore = new Array();
+		imgscore = str1.split(",");
+		console.log('Client Imgscore: '+imgscore);
+		
 		var roompass='';
 		if(room.roompassword){
 		 roompass=room.roompassword;
 		}else{
 		 roompass='na';
 		}
-		 $('#rooms').append('<li class="list-group-item"><span class="badge">Player Limit : '+room.roomlimit+'</span><b>'+room.roomname+'</b>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" class="btn btn-sm btn-primary" onclick="switchRoom(\''+room.roomname+'\',\''+room.roomlimit+'\',\''+roompass+'\',\''+imgvalue+'\')">click here to join</a></li>');
+		 $('#rooms').append('<li class="list-group-item"><span class="badge">Player Limit : '+room.roomlimit+'</span><b>'+room.roomname+'</b>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" class="btn btn-sm btn-primary" onclick="switchRoom(\''+room.roomname+'\',\''+room.roomlimit+'\',\''+roompass+'\',\''+imgvalue+'\',\''+imgscore+'\')">click here to join</a></li>');
 	});
 
-	function switchRoom(name,playerslimit,pass,imgvalue){
+	function switchRoom(name,playerslimit,pass,imgvalue,imgscore){
 		socket.emit('switchRoom', {
 		roomname:name,
 		roomlimit:playerslimit,
 		roompassword:pass,
 		imgvalue : imgvalue,
+		imgscore : imgscore,
 		Playerusername : playername, 
 		PlayerSocketId : socket.id
 		});
 	}
 	
-	function restartGame(name,playerslimit,pass,imgvalue){
+	function restartGame(name,playerslimit,pass,imgvalue,imgscore){
 		socket.emit('restartGame', {
 		roomname:name,
 		roomlimit:playerslimit,
 		roompassword:pass,
 		imgvalue : imgvalue,
+		imgscore : imgscore,
 		Playerusername : playername, 
 		PlayerSocketId : socket.id
 		});
@@ -328,19 +343,25 @@
 		$('#invitations').append('<li class="list-group-item"><b>'+data.sendername+' has invited to join '+ data.roomname+'</b>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" class="btn btn-sm btn-primary" onclick="joinRoom(\''+data.roomname+'\')">click here to join</a></li>');
 	});
 
-	socket.on('sendImg', function (value) {
+	socket.on('sendImg', function (data) {
 		$('#currentuser').html('');
 		$("#menuToggler").hide(500);
 		closeNav();
-		var str = value;
+		
+		var str = data.imgvalue;
+		var str1 = data.imgscore;
+		console.log('Client Imgvalue ->'+str);
+		console.log('Client Imgscore ->'+str1);
 		var imgvalue = new Array();
+		var imgscore = new Array();
 		imgvalue = str.split(",");
+		imgscore = str1.split(",");
 		console.log('Client Imgvalue'+imgvalue);
 		
 		//var imgvalue=['1','2','3','4','2','4','4','3','2','1','2','4','1','3','3','2'];
 		// on connection to server, ask for user's name with an anonymous callback	
 		for(var i=0;i<imgvalue.length;i++){
-			$('#currentuser').append('<div id="drag-'+imgvalue[i]+'" data-val="'+imgvalue[i]+'" class="col-xs-3 col-sm-3 col-md-2 col-lg-2 draggable"><a href="javascript:void(0)" class="thumbnail" style="width:180px;height:250px"><img  src="/'+imgvalue[i]+'.jpg" img-val="'+imgvalue[i]+'" width="180" height="250"> </a></div>');
+			$('#currentuser').append('<div id="drag-'+imgvalue[i]+'" data-val="'+imgvalue[i]+'" data-score="'+imgscore[i]+'" class="col-xs-3 col-sm-3 col-md-2 col-lg-2 draggable"><a href="javascript:void(0)" class="thumbnail text-center" style="width:180px;height:250px"><img  src="/'+imgvalue[i]+'.jpg" img-val="'+imgvalue[i]+'" width="180" height="250"><span class="badge">Score: '+imgscore[i]+'</span></a></div>');
 			$('#drag-'+imgvalue[i]).draggable({
 				  revert: 'invalid',
 				  cursor:'move'
@@ -386,24 +407,26 @@
 		});
 	});
 	
-	function requestToanother(opponant,opponantsocketId,imgval,roomlimit){
+	function requestToanother(opponant,opponantsocketId,imgval,imgscore,roomlimit){
 	    
 		socket.emit('sendimg', {
 			trgPlayer:opponant,
 			srcPlayer:playername,
 			srcImg:imgval,
+			imgscore:imgscore,
 			trgsocketId:opponantsocketId,
 			roomlimit:roomlimit,
 			srcsocketId:socket.id
 		});
 	}
 	
-	function requestTo(opponant,opponantsocketId,imgval,roomlimit){
+	function requestTo(opponant,opponantsocketId,imgval,imgscore,roomlimit){
 	    
 		socket.emit('sendimg', {
 			trgPlayer:opponant,
 			srcPlayer:playername,
 			srcImg:imgval,
+			imgscore:imgscore,
 			trgsocketId:opponantsocketId,
 			roomlimit:roomlimit,
 			srcsocketId:socket.id
@@ -442,7 +465,7 @@
 				fontColor: '#FFFFFF',
 				autostart: false,
 				onComplete: function () {
-					requestTo(data.srcPlayer,targetattr,data.imgvalue,data.roomlimit);
+					requestTo(data.srcPlayer,targetattr,data.imgvalue,data.imgscore,data.roomlimit);
 				    $("#"+data.imgvalue).parent('.draggable').remove();
 					console.log('done');
 				}
