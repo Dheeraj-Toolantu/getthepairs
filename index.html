@@ -35,17 +35,28 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 	<style>
-	#displayResult {
-				border:1.5px solid black;
-				position:absolute;
-				z-index:1000;
-				top:0;
-				right:0;
-				width:190px;
-				height:100%;
-				background-color:#F2F2F2;
-				layer-background-color:#F2F2F2;
-			}
+.w3-sidebar{height:100%;width:200px;background-color:#fff;position:fixed!important;z-index:1000;overflow:hidden}
+.w3-bar-block .w3-dropdown-hover,.w3-bar-block .w3-dropdown-click{width:100%}
+.w3-bar-block .w3-dropdown-hover .w3-dropdown-content,.w3-bar-block .w3-dropdown-click .w3-dropdown-content{min-width:100%}
+.w3-bar-block .w3-dropdown-hover .w3-button,.w3-bar-block .w3-dropdown-click .w3-button{width:100%;text-align:left;padding:8px 16px}
+.w3-bar{width:100%;overflow:hidden}.w3-center .w3-bar{display:inline-block;width:auto}
+.w3-bar .w3-bar-item{padding:8px 16px;float:left;width:auto;border:none;outline:none;display:block}
+.w3-bar .w3-dropdown-hover,.w3-bar .w3-dropdown-click{position:static;float:left}
+.w3-bar .w3-button{white-space:normal}
+.w3-bar-block .w3-bar-item{width:100%;display:block;padding:8px 16px;text-align:left;border:none;outline:none;white-space:normal;float:none}
+.w3-bar-block.w3-center .w3-bar-item{text-align:center}.w3-block{display:block;width:100%}
+.w3-tiny{font-size:10px!important}.w3-small{font-size:12px!important}.w3-medium{font-size:15px!important}.w3-large{font-size:18px!important}
+.w3-button:hover{color:#000!important;background-color:#ccc!important}
+a{background-color:transparent;-webkit-text-decoration-skip:objects}
+a:active,a:hover{outline-width:0}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted}
+.w3-btn,.w3-button{border:none;display:inline-block;outline:0;padding:8px 16px;vertical-align:middle;overflow:hidden;text-decoration:none;color:inherit;background-color:inherit;text-align:center;cursor:pointer;white-space:nowrap}
+.w3-btn:hover{box-shadow:0 8px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19)}
+.w3-btn,.w3-button{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}   
+@media (max-width:992px){.w3-sidebar.w3-collapse{display:none}.w3-main{margin-left:0!important;margin-right:0!important}}
+
+</style>
+
+	<style>
 		.div1 {
 			border: 1px solid #a1a1a1;
 		}
@@ -90,31 +101,63 @@
 	<body style="overflow-x:hidden">
 
 <div id="gamearea" class="hidepannel">
-<div id="mySidenav" class="sidenav">
-  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-  <div id="onlineplayers"></div>
+<div id="mySidenav" class="w3-sidebar w3-bar-block w3-border-right sidenav" style="display:none">
+  <div class="row" onclick="closeNav()">
+		<div style="padding:5px 10px 5px 10px;background:#616161!important;color:#fff!important">
+		<div class="media-left">
+			<a href="javascript:void(0)">
+				<img class="media-object" src="/profile.png" alt="profile picture" height=50 >
+			</a>
+		</div>
+		<div class="media-body">
+			<h4 class="singleuser"><strong></strong></h4>
+		</div>
+		<div class="media-right">
+			<a href="javascript:void(0)" onclick="closeNav()" style="color:#fff!important"><i class="glyphicon glyphicon-remove-sign"></i></a>
+		</div>
+		</div>
+  </div>
+  <div class="row" id="onlineplayers"></div>
 </div>
+
+<div id="mySidenav_scorecard" class="w3-sidebar w3-bar-block w3-border-right sidenav" style="display:none">
+    <div class="row" onclick="closescoreNav()">
+		<div style="padding:5px 5px 5px 15px;background:#616161!important;color:#fff!important">
+			<h4>Players ScoreCard&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-remove-sign"></span></h4>
+		</div>
+  </div>
+  <div class="row" id="displayResult" style="max-height:700px;overflow-y:scroll;">
+	
+  </div>
+</div>
+
+<script>
+function openNav() {
+    document.getElementById("mySidenav").style.display = "block";
+}
+function closeNav() {
+    document.getElementById("mySidenav").style.display = "none";
+}
+
+function openscoreNav() {
+    document.getElementById("mySidenav_scorecard").style.display = "block";
+}
+function closescoreNav() {
+    document.getElementById("mySidenav_scorecard").style.display = "none";
+}
+</script>
+
 
 <div id="main">
   	<div class="panel panel-default">
-		
-		<span id="menuToggler" style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; <a href="javascript:void(0);">Invite Players</a></span>
-		
-		<div class="pull-right" id="CountDownTimer" data-timer="0" style="width:auto; height: 100px;"></div>
+		<div class="pull-right" id="CountDownTimer" data-timer="0" style="width:auto;height:50px;margin-right:5px;"></div>
 		  <div class="panel-heading">	
 			<h3 class="panel-title">
-			<div class="media">
-				<div class="media-left">
-					<a href="javascript:void(0)">
-						<img class="media-object" src="/profile.png" alt="profile picture" height=80 >
-					</a>
-				</div>
-				<div class="media-body">
-					<h4 class="media-heading singleuser"><strong></strong></h4>
-					<span style="font-size:9px;">&nbsp;<a href="javascript:void(0)">Players Online <span class="badge" id="count"></span></a></span>
-					 <span id="restartGame"></span>
-				</div>
-			</div>	
+				<button id="menuToggler" class="btn btn-xs btn-primary" href="javascript:void(0);" onclick="openNav()"><span  style="cursor:pointer" >&#9776; Invite Players</span></button>
+				<button class="btn btn-xs btn-info"><span class="glyphicon glyphicon-user"></span>&nbsp;Players <span class="badge" id="count"></span></button>
+				<button class="btn btn-xs btn-success" onclick="openscoreNav()"><span class="glyphicon glyphicon-user"></span>&nbsp;Score Card</button>
+				
+				<div id="restartGame" style="padding-top:5px;"></div>
 			</h3>
 		  </div>
 		  <div class="panel-body">	
@@ -123,20 +166,6 @@
 				<div id="targetOutcome" class="col-md-12 col-sm-12 col-xs-12"></div>
 			</div>
 			<div  class="row">
-				<div id="displayResult" style="right: -190px; top: 0px; width: 200px;max-height:500px;overflow-y:scroll;">
-					<p>Result Display</p>
-				</div>
-				<script>
-					
-				$('#displayResult').hover(function () {
-					 $(this).stop().animate({right:"0px"},500);     
-				   },function () {
-					   var width = $(this).width() -10;
-					   $(this).stop().animate({right: - width  },500);     
-				});
-				
-				</script>
-				
 				<div class="col-md-12 col-sm-12 col-xs-12">
 				<div class="swiper-container">
 					<div id="players" class="swiper-wrapper">
@@ -312,18 +341,7 @@
 			</div>
 		</div>
 	</div>	
-	
-	<script>
-		function openNav() {
-			document.getElementById("mySidenav").style.width = "250px";
-			document.getElementById("main").style.marginLeft = "250px";
-		}
 
-		function closeNav() {
-			document.getElementById("mySidenav").style.width = "0";
-			document.getElementById("main").style.marginLeft= "0";
-		}
-	</script>
 	<script>
 	function getpairs(roomlimit){
 			var oldval=0;
