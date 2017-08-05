@@ -11,11 +11,15 @@ app.use(bodyParser.urlencoded({extended: true}));
 var mysql = require('mysql');
 
 var con = mysql.createConnection({
-  host: "getthepair.cr1a92pwyyql.us-east-2.rds.amazonaws.com",
-  user: "toolantu",
-  password: "789system",
-  database:"getthepair"
+    host: "getthepair.cr1a92pwyyql.us-east-2.rds.amazonaws.com",
+    user: "toolantu",
+    password: "789system",
+    database:"getthepair"
 });
+con.connect(function(err) {
+		  if (err) throw err;
+		  console.log("Connected to db!");
+		});
 
 
 app.get('/', function (req, res) {
@@ -74,23 +78,26 @@ io.sockets.on('connection', function (socket) {
 	
 	socket.on('create', function(room) {
 		var playerlimit = room.roomlimit;
+		var imgscore='';
 		console.log("creating room...");
 		
-		con.connect(function(err) {
-		  if (err) throw err;
-		  console.log("Connected!");
-		  con.query("SELECT * FROM pairtype WHERE ptype_player_count="+playerlimit+" order by rand() limit 1", function (err, row, fields) {
+		con.query("SELECT * FROM pairtype WHERE ptype_player_count="+playerlimit+" order by rand() limit 1", function (err, row, fields) {
 			if (err) throw err;
 					imgvalue=row[0].ptype_set;
-					room['imgvalue'] = imgvalue;
-					rooms.push(room);;
-					socket.emit('updaterooms', room);
-					socket.broadcast.emit('updaterooms', room);
-					console.log('rooms created :'+ room.roomname);
-					console.log('rooms created with img:'+ room.imgvalue);
-			
+					con.query("SELECT GROUP_CONCAT(img_score SEPARATOR ',') as imgscore FROM imgpair WHERE imgval in ("+imgvalue+") ", function (err, row1, fields) {
+						if (err) throw err;
+							imgscore=row1[0].imgscore;
+							console.log("imgscore of room-->"+imgscore);
+							room['imgvalue'] = imgvalue;
+							room['imgscore'] = imgscore;
+							rooms.push(room);
+							socket.emit('updaterooms', room);
+							socket.broadcast.emit('updaterooms', room);
+							console.log('rooms created :'+ room.roomname);
+							console.log('rooms created with img:'+ room.imgvalue);
+							console.log('rooms created with imgscore:'+ room.imgscore);
+					});
 			});
-		});
 	});
 	
 	socket.on('switchRoom', function(newroom) {
@@ -155,6 +162,7 @@ io.sockets.on('connection', function (socket) {
 					    roomname:item.roomname,
 						roomlimit:item.roomlimit,
 						imgvalue : item.imgvalue, 
+						imgscore : item.imgscore, 
 						roompassword:item.roompassword
 					}
 				}
@@ -203,7 +211,7 @@ io.sockets.on('connection', function (socket) {
 	});
 
 	socket.on('gameStarted', function (data) { 
-		socket.emit('sendImg',data.imgvalue);
+		socket.emit('sendImg',data);
 		console.log("playerstarted-->"+data.playersocketid);
 		console.log("game started with img-->"+data.imgvalue);
 	});
@@ -216,6 +224,7 @@ io.sockets.on('connection', function (socket) {
 	socket.on('winner', function (data) {
 		var currentroom='';
 		var winningPlayer={};
+		var userscore=0;
 		var winningPlayerarr={};
 		var playerPlaying = data.playerPlaying;
 		var currentroomlimit=data.roomlimit;
@@ -237,30 +246,42 @@ io.sockets.on('connection', function (socket) {
 		 
 		console.log('updated pending player-->'+playerPlaying.length);
 				
-		if(data.rank==1){
-			data['score'] = '5000';
-		}else if(data.rank==2){
-			data['score'] = '3000';
-		}else if(data.rank==3){
-			data['score'] = '1500';
-		}else if(data.rank==4){
-			data['score'] = '1000';
-		}else if(data.rank==5){
-			data['score'] = '500';
-		}
-		
-	
-		  
-		  con.query("INSERT INTO userpaircollection SET  usercollec_imgval="+data.imgval+",usercollec_img_count="+data.imgcnt+",usercollec_userrank="+data.rank+",usercollec_username='"+data.playername+"',usercollec_usersocketid='"+data.srcsocketId+"',usercollec_room='"+currentroom+"',usercollec_user_ipaddr='127.0.0.1' ", function (err, result) {
+		con.query("SELECT * FROM imgpair WHERE imgval="+data.imgval+" limit 1", function (err, row, fields) {
 			if (err) throw err;
-				console.log("1 record inserted");
+					imgvalue=row[0].img_score;
+					if(data.rank==1){
+						data['score'] = (1000 + (parseInt(data.imgcnt) * imgvalue));
+						userscore= (1000 + (parseInt(data.imgcnt) * imgvalue));
+					}else if(data.rank==2){
+						data['score'] = (500 + (parseInt(data.imgcnt) * imgvalue));
+						userscore= (500 + (parseInt(data.imgcnt) * imgvalue));
+					}else if(data.rank==3){
+						data['score'] = (200 + (parseInt(data.imgcnt) * imgvalue));
+						userscore= (200 + (parseInt(data.imgcnt) * imgvalue));
+					}else if(data.rank==4){
+						data['score'] = (100 + (parseInt(data.imgcnt) * imgvalue));
+						userscore= (100 + (parseInt(data.imgcnt) * imgvalue));
+					}else if(data.rank==5){
+						data['score'] = (50 + (parseInt(data.imgcnt) * imgvalue));
+						userscore= (50 + (parseInt(data.imgcnt) * imgvalue));
+					}else{
+					   data['score'] = (10 + (parseInt(data.imgcnt) * imgvalue));
+					   userscore= (10 + (parseInt(data.imgcnt) * imgvalue));
+					}
+				console.log("score-->"+userscore);
+				con.query("INSERT INTO userpaircollection SET  usercollec_imgval="+data.imgval+",usercollec_img_count="+data.imgcnt+",usercollec_userrank="+data.rank+",usercollec_user_score="+userscore+",usercollec_username='"+data.playername+"',usercollec_usersocketid='"+data.srcsocketId+"',usercollec_room='"+currentroom+"',usercollec_user_ipaddr='127.0.0.1' ", function (err, result) {
+					if (err) throw err;
+					console.log("1 record inserted");
+				});
+				
+				playerScorecard.push(data);
+				socket.broadcast.to(socket.room).emit('alertWinner',data,playerScorecard,playerPlaying,currentroom,currentroomlimit);
+				socket.emit('disableplayer',playerPlaying);
+				console.log('After updated length'+playerPlaying.length);
+						
 			});
 
 		
-		playerScorecard.push(data);
-		socket.broadcast.to(socket.room).emit('alertWinner',data,playerScorecard,playerPlaying,currentroom,currentroomlimit);
-		socket.emit('disableplayer',playerPlaying);
-		console.log('After updated length'+playerPlaying.length);
 	});
 	
 	socket.on('gameover', function (playersocketid,pendingPlayers,currentroom,playerlimit) {
@@ -271,12 +292,16 @@ io.sockets.on('connection', function (socket) {
 		console.log('after creting room-->' + playercnt);
 		if(!cntr){
 		
-
-		  con.query("SELECT * FROM pairtype  WHERE ptype_player_count ="+playercnt+" order by rand() limit 1", function (err, row, fields) {
+		con.query("SELECT * FROM pairtype  WHERE ptype_player_count ="+playercnt+" order by rand() limit 1", function (err, row, fields) {
 			if (err) throw err;
 					imgvalue=row[0].ptype_set;
+					con.query("SELECT GROUP_CONCAT(img_score SEPARATOR ',') as imgscore FROM imgpair WHERE imgval in ("+imgvalue+") ", function (err, row1, fields) {
+						if (err) throw err;
 						
+						imgscore=row1[0].imgscore;
+							
 						room =  {'imgvalue':imgvalue,
+						         'imgscore':imgscore,
 								 'roomlimit': playercnt,
 								 'roomname' : currentroom,
 								 'roompassword' : 'na'
@@ -288,7 +313,7 @@ io.sockets.on('connection', function (socket) {
 						socket.broadcast.to(socket.room).emit('recreateroom', room);
 						displayResult(playersocketid,currentroom);
 						console.log("game is over:-->"+socket.room);
-					
+					});
 			
 			});
 		cntr++;
@@ -298,11 +323,10 @@ io.sockets.on('connection', function (socket) {
 	
 	function displayResult(playersocketid,currentroom){
 	    console.log('displaying result....'+currentroom );
-		con.query("SELECT usercollec_room,usercollec_usersocketid,usercollec_username,usercollec_imgval,sum(usercollec_img_count) as usercollec_img_count FROM userpaircollection  WHERE usercollec_room ='"+currentroom+"'  group by usercollec_usersocketid,usercollec_username,usercollec_imgval,usercollec_room ", function (err, row, fields) {
+		con.query("Select * from ( SELECT usercollec_room,usercollec_usersocketid,usercollec_username,usercollec_imgval,sum(usercollec_img_count) as usercollec_img_count,sum(usercollec_user_score) as userscore FROM userpaircollection  WHERE usercollec_room ='"+currentroom+"'  group by usercollec_usersocketid,usercollec_username,usercollec_imgval,usercollec_room order by usercollec_imgval) tbl order by tbl.userscore desc", function (err, row, fields) {
 			if (err) throw err;
 					console.log("Display Result : "+row.length);
 					socket.broadcast.to(currentroom).emit('displayResult', row);
-					
 			});
 	}
 	
