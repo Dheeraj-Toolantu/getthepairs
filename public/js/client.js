@@ -34,7 +34,6 @@
 	    currentroom=roomdetails.roomname;
 		$('#players').html('');
 		$('#restartGame').html('');
-		$('#displayResult').html('');
 		$('#targetOutcome').html('');
 		var i=0;
 		rank=1;
@@ -95,8 +94,41 @@
 						setTimeout(
 							  function() 
 							  {
-								$("#CountDownTimer").TimeCircles({ time: { Days: { show: false }, Hours: { show: false } }});
+								//$("#CountDownTimer").TimeCircles({ time: { Days: { show: false }, Hours: { show: false } }});
+								$("#CountDownTimer").TimeCircles({
+									time: { Days: { show: false }, Hours: { show: false } }
+									}).addListener(function(unit,value,total) {
+										if(total == 0){
+											$("#CountDownTimer").TimeCircles().stop();
+											socket.emit('displayFinalResult',{
+											 roomname:roomdetails.roomname,
+											 playersocketid:socket.id
+											});
+										}
+								});
 							  }, 500);
+							  
+						/*var countdown =  1  * 60 * 1000;
+						var timerId = setInterval(function(){
+						  countdown -= 1000;
+					 	  var min = Math.floor(countdown / (60 * 1000));
+						  //var sec = Math.floor(countdown - (min * 60 * 1000));  // wrong
+						  var sec = Math.floor((countdown - (min * 60 * 1000)) / 1000);  //correct
+
+						  if (countdown <= 0) {
+							 $("#CountDownTimer").TimeCircles().stop();
+							 socket.emit('displayFinalResult',{
+								 roomname:roomdetails.roomname,
+								 playersocketid:socket.id
+								});
+							 clearInterval(timerId);
+							 //doSomething();
+						  } else {
+							 $("#countTime").html(min + " : " + sec);
+						  }
+
+						}, 1000); //1000ms. = 1sec.	 */ 
+							  
 				}else{
 					
 					if((roomdetails.roomlimit - i)>1){
@@ -250,6 +282,50 @@
 		*/
 		
 	});
+	
+	socket.on('writeFinalResult', function (data) {
+	    $("#writeFinalResult").html('');
+	    $(".swiper-container").hide(500);
+		$("#getAllpairs").hide(500);
+		$("#menuToggler").hide(500);
+		$("#restartGame").hide(500);
+		
+		var str3='';
+		var str4='';
+		for(var l=0;l < data.length;l++){
+		    str3='';
+			str4='';
+			var str1 = data[l].usercollec_imgval;
+			var imgval = new Array();
+			imgval = str1.split(",");
+			
+			var str2 = data[l].usercollec_img_count;
+			var imgcnt = new Array();
+			imgcnt = str2.split(",");
+			
+			var str5= data[l].userscore;
+			var imgscore = new Array();
+			imgscore = str5.split(",");
+			
+			str3 = '<div class="col-md-4"><div class="panel panel-default"><div class="panel-heading"><h4>'+data[l].usercollec_username+'</h4> &nbsp;<span class="badge">Total Coins: '+data[l].usertotalscore+'</span></div><div class="panel-body"><ul class="list-group">';
+			
+			for(var m=0;m<imgval.length;m++){
+				str4 = str4 + '<li class="list-group-item"><div class="media"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="/'+imgval[m]+'.jpg" alt="profile picture" height="40px" ></a></div><div class="media-body"><b>&nbsp;<span class="badge">Pairs : '+imgcnt[m]+'</span>&nbsp;<span class="badge">Coins : '+imgscore[m]+'</span></b></div></div></li>';
+			}
+			str3 = str3+str4+'<ul></div></div></div>';
+			
+			$("#writeFinalResult").append(str3);
+		}
+		/*$.each(playerScorecard, function(key, value) {
+		    if(value.room==currentroom){
+				
+				$("#writeFinalResult").append('<div class="media"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="/profile.png" alt="profile picture" height="80px" ></a></div><div class="media-body"><h4 class="media-heading"><strong>'+value.playername+'</strong></h4><b>&nbsp;<span class="badge">Rank : '+value.rank+'</span>&nbsp;<span class="badge">Coins : '+value.score+'</span></b></div></div>');
+				
+				$("#menuToggler").show(500);
+			}
+		});*/
+	});
+	
 	
 	socket.on('recreateroom',function(room){
 		var str = room.imgvalue;
