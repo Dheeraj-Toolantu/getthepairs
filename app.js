@@ -9,7 +9,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 var mysql = require('mysql');
-
 var con = mysql.createConnection({
     host: "getthepair.cr1a92pwyyql.us-east-2.rds.amazonaws.com",
     user: "toolantu",
@@ -330,6 +329,18 @@ io.sockets.on('connection', function (socket) {
 			});
 	}
 	
+	socket.on('displayFinalResult', function(data){
+		var playersocketid = data.playersocketid;
+		var currentroom = data.roomname;
+		console.log('displaying Final Result....'+currentroom );
+		con.query("Select GROUP_CONCAT(tbl1.usercollec_imgval SEPARATOR ',') as usercollec_imgval,GROUP_CONCAT(tbl1.usercollec_img_count SEPARATOR ',') as usercollec_img_count,GROUP_CONCAT(tbl1.userscore SEPARATOR ',') as userscore,tbl1.usercollec_username,tbl2.usertotalscore from (SELECT usercollec_room,usercollec_usersocketid,usercollec_username,usercollec_imgval,sum(usercollec_img_count) as usercollec_img_count,sum(usercollec_user_score) as userscore FROM userpaircollection WHERE usercollec_room ='"+currentroom+"'  group by usercollec_usersocketid,usercollec_username,usercollec_imgval,usercollec_room order by usercollec_username) tbl1 inner join (select usercollec_usersocketid,sum(usercollec_user_score) as usertotalscore from userpaircollection where usercollec_room='"+currentroom+"' group by usercollec_usersocketid) tbl2 on tbl1.usercollec_usersocketid=tbl2.usercollec_usersocketid group by tbl1.usercollec_usersocketid order by tbl2.usertotalscore desc", function (err, row, fields) {
+			if (err) throw err;
+					console.log("Display Final Result : "+row.length);
+					
+					io.sockets.in(currentroom).emit('writeFinalResult', row);
+				
+			});
+	});
 	socket.on('restartGame', function(newroom) {
         //var oldroom;
         //oldroom = socket.room;
