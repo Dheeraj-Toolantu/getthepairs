@@ -150,59 +150,55 @@ function closescoreNav() {
 
 <div id="main">
   	<div class="panel panel-default">
-		<div class="pull-right" id="CountDownTimer" data-timer="0" style="width:auto;height:50px;margin-right:5px;"></div>
-		  <div class="panel-heading">	
-			<h3 class="panel-title">
-				<button id="menuToggler" class="btn btn-xs btn-primary" href="javascript:void(0);" onclick="openNav()"><span  style="cursor:pointer" >&#9776; Invite Players</span></button>
-				<button class="btn btn-xs btn-info"><span class="glyphicon glyphicon-user"></span>&nbsp;Players <span class="badge" id="count"></span></button>
-				<button class="btn btn-xs btn-success" onclick="openscoreNav()"><span class="glyphicon glyphicon-user"></span>&nbsp;Score Card</button>
-				
-				<div id="restartGame" style="padding-top:5px;"></div>
-			</h3>
-		  </div>
-		  <div class="panel-body">	
-			
+		<div class="pull-right" id="CountDownTimer" data-timer="60" style="width:auto;height:50px;margin-right:5px;"></div>
+			<div class="panel-heading">	
+				<h3 class="panel-title">
+					<button id="menuToggler" class="btn btn-xs btn-primary" href="javascript:void(0);" onclick="openNav()"><span  style="cursor:pointer" >&#9776; Invite Players</span></button>
+					<button class="btn btn-xs btn-info"><span class="glyphicon glyphicon-user"></span>&nbsp;Players <span class="badge" id="count"></span></button>
+					<button class="btn btn-xs btn-success" onclick="openscoreNav()"><span class="glyphicon glyphicon-user"></span>&nbsp;Score Card</button>
+					
+					<div id="restartGame" style="padding-top:5px;"></div>
+				</h3>
+			</div>
+			<div class="panel-body">	
 			<div  class="row">
 				<div id="targetOutcome" class="col-md-12 col-sm-12 col-xs-12"></div>
 			</div>
+			
 			<div  class="row">
+				<div id="writeFinalResult" class="col-md-12">
+				</div>
 				<div class="col-md-12 col-sm-12 col-xs-12">
 				<div class="swiper-container">
-					<div id="players" class="swiper-wrapper">
-						
-					</div>
-					
+					<div id="players" class="swiper-wrapper"></div>
 					<!-- Add Pagination -->
 					<div class="swiper-pagination"></div>
 				</div>
-			<script>
-				var swiper = new Swiper('.swiper-container', {
-					pagination: '.swiper-pagination',
-					slidesPerView: 'auto',
-					nextButton: '.swiper-button-next',
-					prevButton: '.swiper-button-prev',
-					paginationClickable: true,
-					spaceBetween: 30,
-					grabCursor: true,
-					freeMode: true
-					
-				});
-				/*
-				var swiper = new Swiper('.swiper-container', {
-					scrollbar: '.swiper-scrollbar',
-					scrollbarHide: true,
-					slidesPerView: 'auto',
-					centeredSlides: true,
-					spaceBetween: 30,
-					grabCursor: true
-				});
-				*/
-			
-			</script>
-			
+				<script>
+					var swiper = new Swiper('.swiper-container', {
+						pagination: '.swiper-pagination',
+						slidesPerView: 'auto',
+						nextButton: '.swiper-button-next',
+						prevButton: '.swiper-button-prev',
+						paginationClickable: true,
+						spaceBetween: 30,
+						grabCursor: true,
+						freeMode: true
+						
+					});
+					/*
+					var swiper = new Swiper('.swiper-container', {
+						scrollbar: '.swiper-scrollbar',
+						scrollbarHide: true,
+						slidesPerView: 'auto',
+						centeredSlides: true,
+						spaceBetween: 30,
+						grabCursor: true
+					});
+					*/
 				
+				</script>
 			</div>
-				
 				<div class="col-md-12 col-sm-12 col-xs-12" id="getAllpairs">		
 					<div class="col-md-12 center-text" id="currentuser" style="margin-top:10px;">
 						<span id="playerneeded" style="font-size:18px;"></span>
@@ -214,7 +210,7 @@ function closescoreNav() {
 						<div id="conversation" class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="max-height:300px;overflow-y:scroll;"></div>
 					</div>
 					<div class="row">
-					  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+					  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<div class="input-group">
 						  <input type="text" id="data" class="form-control" placeholder="MESSAGE">
 						  <span class="input-group-btn">
@@ -250,7 +246,6 @@ function closescoreNav() {
 				<div class="media-right">
 						
 							<input type="text" id="roomname" class="form-control" placeholder="ROOM NAME">
-						  
 							<select id="roomlimit" class="form-control">
 							  <option value="">PLAYER LIMIT</option>
 							  <option value="3">3</option>
@@ -260,9 +255,8 @@ function closescoreNav() {
 							  <option value="7">7</option>
 							  <option value="8">8</option>
 							</select>
-							
 							<button class="btn btn-success	" id="roombutton" type="button">CREATE ROOM</button>
-						  </div><!-- /.col-lg-6 -->
+						</div><!-- /.col-lg-6 -->
 					</div>
 				</div>	
 			</div>
@@ -332,11 +326,7 @@ function closescoreNav() {
 			  </div> <!-- end login -->
 			  
 			</div>
-			
-			
-			
-	    </div>
-		
+		</div>
 		</center>
 			</div>
 		</div>
@@ -387,38 +377,4 @@ function closescoreNav() {
 		}
 </script>
 
-        <script>
-            $("#DateCountdown").TimeCircles();
-            
-            $("#PageOpenTimer").TimeCircles();
-            
-            var updateTime = function(){
-                var date = $("#date").val();
-                var time = $("#time").val();
-                var datetime = date + ' ' + time + ':00';
-                $("#DateCountdown").data('date', datetime).TimeCircles().start();
-            }
-            $("#date").change(updateTime).keyup(updateTime);
-            $("#time").change(updateTime).keyup(updateTime);
-            
-            // Start and stop are methods applied on the public TimeCircles instance
-            $(".startTimer").click(function() {
-                $("#CountDownTimer").TimeCircles().start();
-            });
-            $(".stopTimer").click(function() {
-                $("#CountDownTimer").TimeCircles().stop();
-            });
-
-            // Fade in and fade out are examples of how chaining can be done with TimeCircles
-            $(".fadeIn").click(function() {
-                $("#PageOpenTimer").fadeIn();
-            });
-            $(".fadeOut").click(function() {
-                $("#PageOpenTimer").fadeOut();
-            });
-
-        </script>      
-<style>
-
-</style>
 </body>
